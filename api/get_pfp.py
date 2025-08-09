@@ -51,8 +51,66 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({'error': 'Username parameter is missing'}).encode('utf-8'))
             return
 
+        # Accept both username and full Twitter URL
+        if username and 'twitter.com' in username:
+            try:
+                url = username if username.startswith('http') else f'https://{username}'
+                from urllib.parse import urlparse
+                path = urlparse(url).path
+                parts = [p for p in path.split('/') if p]
+                if parts:
+                    candidate = parts[0]
+                    reserved = ['home','explore','notifications','messages','search','settings','compose','login','signup','i','hashtag','logout','tos','privacy','about','intent','share','download']
+                    import re
+                    if re.match(r'^[A-Za-z0-9_]{1,15}$', candidate) and candidate.lower() not in reserved:
+                        username = candidate
+                    else:
+                        self.send_response(400)
+                        self.send_header('Content-type', 'application/json')
+                        self.send_header('Access-Control-Allow-Origin', '*')
+                        self.end_headers()
+                        self.wfile.write(json.dumps({'error': 'Invalid Twitter username in URL'}).encode('utf-8'))
+                        return
+                else:
+                    self.send_response(400)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({'error': 'No username found in Twitter URL'}).encode('utf-8'))
+                    return
+            except Exception as e:
+                print(f"Error parsing Twitter URL: {e}")
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({'error': 'Invalid Twitter URL'}).encode('utf-8'))
+                return
+
         # Run the asynchronous function to get the profile data
-        result, error = asyncio.run(self.get_pfp_url(username))
+        try:
+            import asyncio
+            try:
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
+                loop = None
+            if loop and loop.is_running():
+                # If already running (rare in this context), create a new loop
+                new_loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(new_loop)
+                result, error = new_loop.run_until_complete(self.get_pfp_url(username))
+                new_loop.close()
+                asyncio.set_event_loop(loop)
+            else:
+                result, error = asyncio.get_event_loop().run_until_complete(self.get_pfp_url(username))
+        except Exception as e:
+            print(f"Error running async function: {e}")
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({'error': f'Internal server error: {e}'}).encode('utf-8'))
+            return
 
         if error:
             self.send_response(404) # Not Found or other error

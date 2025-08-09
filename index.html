@@ -195,8 +195,8 @@
             <h2 class="font-primary text-4xl md:text-6xl red-glow mb-12">JOIN THE RESISTANCE</h2>
             <div class="flex flex-col md:flex-row gap-8 justify-center">
                 <a href="#" class="community-link font-primary text-2xl text-black bg-[#00FFFF] hover:bg-[#00BFFF] p-8 border-4 border-black transition-transform hover:scale-105">🔫 Twitter</a>
-                <a href="#" class="community-link font-primary text-2xl text-black bg-[#FF00FF] hover:bg-[#D900D9] p-8 border-4 border-black transition-transform hover:scale-105">🚀 Telegram</a>
-                <a href="#" class="community-link font-primary text-2xl text-black bg-[#FFFF00] hover:bg-[#DCDC00] p-8 border-4 border-black transition-transform hover:scale-105">💥 Discord</a>
+                <a href="#" class="community-link font-primary text-2xl text-black bg-[#FF00FF] hover:bg-[#D900D9] p-8 border-4 border-black transition-transform hover:scale-105">🧠 Axiom</a>
+                <a href="#" class="community-link font-primary text-2xl text-black bg-[#FFFF00] hover:bg-[#DCDC00] p-8 border-4 border-black transition-transform hover:scale-105">🚀 Pumpfun</a>
             </div>
         </div>
     </section>
@@ -401,15 +401,26 @@
             function sanitizeHandle(value) {
                 const raw = (value || '').trim();
                 if (!raw) return '';
-                const noAt = raw.replace(/^@+/, '');
+                // Accept both username and full Twitter/X URL
                 try {
-                    if (noAt.includes('twitter.com')) {
-                        const url = noAt.startsWith('http') ? new URL(noAt) : new URL('https://' + noAt);
-                        const parts = url.pathname.split('/').filter(Boolean);
-                        return parts[0] || '';
+                    // Accept both twitter.com and x.com
+                    if (raw.includes('twitter.com') || raw.includes('x.com')) {
+                        let url = raw;
+                        if (!url.startsWith('http')) url = 'https://' + url;
+                        const parsed = new URL(url);
+                        const parts = parsed.pathname.split('/').filter(Boolean);
+                        if (parts.length > 0) {
+                            const candidate = parts[0];
+                            const reserved = ['home','explore','notifications','messages','search','settings','compose','login','signup','i','hashtag','logout','tos','privacy','about','intent','share','download'];
+                            if (/^[A-Za-z0-9_]{1,15}$/.test(candidate) && !reserved.includes(candidate.toLowerCase())) {
+                                return candidate;
+                            }
+                        }
+                        return '';
                     }
                 } catch (_) { /* ignore */ }
-                return noAt;
+                // Remove leading @ for plain handles
+                return raw.replace(/^@+/, '');
             }
 
             async function fetchTwitterIntel(handle) {
@@ -468,7 +479,11 @@
                     "Mission Failed... Just kidding. WAGMI."
                 ];
                 const resolvedHandle = data && data.handle ? data.handle : `@${fallbackHandle}`;
-                const resolvedName = data && data.name ? data.name : 'UNKNOWN';
+                // If name is missing, use handle (without @) as name
+                let resolvedName = (data && data.name) ? data.name : '';
+                if (!resolvedName) {
+                    resolvedName = (resolvedHandle.startsWith('@') ? resolvedHandle.slice(1) : resolvedHandle).toUpperCase();
+                }
                 const resolvedPfp = data && data.pfp_url ? data.pfp_url : `https://unavatar.io/twitter/${fallbackHandle}`;
 
                 dossierImg.src = resolvedPfp;
@@ -481,11 +496,8 @@
             }
 
             window.addEventListener('keydown', (e) => {
-                if (['w', 'ArrowUp'].includes(e.key)) {
-                    window.scrollBy(0, -window.innerHeight);
-                } else if (['s', 'ArrowDown'].includes(e.key)) {
-                    window.scrollBy(0, window.innerHeight);
-                }
+                // Remove scroll on 'w', 's', 'ArrowUp', 'ArrowDown'
+                // (No-op)
             });
         });
     </script>
