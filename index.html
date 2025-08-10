@@ -35,10 +35,10 @@
         }
         .font-primary { font-family: var(--font-primary); }
         .font-secondary { font-family: var(--font-secondary); }
-        .text-glow { text-shadow: 0 0 5px var(--color-green), 0 0 10px var(--color-green), 0 0 15px var(--color-green); }
+        .text-glow { text-shadow: 0 0 5px var(--color-green), 0 0 10px var(--color-green), 0 0 15px var(--color-green), 0 0 20px var(--color-green); }
         .box-glow { box-shadow: 0 0 5px var(--color-green), 0 0 10px var(--color-green) inset; }
-        .red-glow { text-shadow: 0 0 5px var(--color-red), 0 0 10px var(--color-red); }
-        .cyan-glow { text-shadow: 0 0 7px var(--color-cyan), 0 0 12px var(--color-cyan); }
+        .red-glow { text-shadow: 0 0 5px var(--color-red), 0 0 10px var(--color-red), 0 0 15px var(--color-red); }
+        .cyan-glow { text-shadow: 0 0 7px var(--color-cyan), 0 0 12px var(--color-cyan), 0 0 18px var(--color-cyan); }
         .section { min-height: 100vh; padding: 5rem 1rem; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; border-bottom: 4px solid var(--color-gray); }
         .custom-cursor {
             position: fixed;
@@ -48,7 +48,7 @@
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            transition: transform 0.1s ease-out;
+            transition: transform 0.1s ease-out, background-color 0.2s ease;
             z-index: 9999;
         }
         .custom-cursor::before, .custom-cursor::after {
@@ -58,6 +58,7 @@
         }
         .custom-cursor::before { top: 50%; left: 0; width: 100%; height: 2px; transform: translateY(-50%); }
         .custom-cursor::after { left: 50%; top: 0; height: 100%; width: 2px; transform: translateX(-50%); }
+        body:hover .custom-cursor { transform: translate(-50%, -50%) scale(1.1); }
         .glitch { animation: glitch-anim 1s infinite; }
         .glitch[data-text]::before, .glitch[data-text]::after {
             content: attr(data-text);
@@ -88,6 +89,11 @@
             background-size: 100% 4px, 6px 100%;
             pointer-events: none;
             z-index: 2;
+            animation: scanline-anim 10s linear infinite;
+        }
+        @keyframes scanline-anim {
+            from { background-position: 0 0; }
+            to { background-position: 0 100vh; }
         }
         .recoil { animation: recoil-anim 0.1s ease-out; }
         @keyframes recoil-anim { 0%, 100% { transform: scale(1); } 50% { transform: scale(0.95); } }
@@ -101,13 +107,56 @@
             height: 100%;
             background-color: var(--color-green);
             transition: width 2s ease-out;
-            box-shadow: 0 0 10px var(--color-green);
+            box-shadow: 0 0 10px var(--color-green), 0 0 20px var(--color-green);
+        }
+        .hero-card {
+            aspect-square: 1;
+            background-color: #1a1a1a;
+            border: 2px solid var(--color-gray);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: var(--color-green);
+            box-shadow: 0 15px 25px rgba(0, 255, 20, 0.2);
+        }
+        .hero-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.4s ease-in-out, transform 0.4s ease;
+        }
+        .hero-card:hover img {
+            filter: saturate(1.5) brightness(1.1);
+            transform: scale(1.1);
+        }
+        .hero-card-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-primary);
+            font-size: 1.5rem;
+            text-shadow: 0 0 8px #000;
+        }
+        .hero-card:hover .hero-card-overlay {
+            opacity: 1;
+        }
+        .community-link:hover {
+            box-shadow: 0 0 20px var(--color-magenta), 0 0 30px var(--color-magenta) inset;
+            transform: scale(1.05) translateY(-5px);
+            filter: brightness(1.2);
         }
     </style>
 </head>
 <body>
     <header id="page-header" class="fixed top-0 left-0 w-full z-50 flex justify-center py-4 text-center">
-        <div id="contract-address-container" class="font-primary text-sm md:text-base text-green-400 cursor-pointer transition-all duration-300 hover:text-white p-2 border-2 border-green-500/0 hover:border-green-500" title="Click to copy">
+        <div id="contract-address-container" class="font-primary text-sm md:text-base text-green-400 cursor-pointer transition-all duration-300 hover:text-white p-2 border-2 border-green-500/0 hover:border-green-500 hover:text-glow" title="Click to copy">
             <span id="contract-text">CA: 000000000</span>
         </div>
     </header>
@@ -124,7 +173,7 @@
     <audio id="scan-sound" src="https://cdn.pixabay.com/audio/2022/02/21/audio_55955d28b6.mp3"></audio>
     <audio id="reload-sound" src="https://cdn.pixabay.com/audio/2022/01/18/audio_89304e28a5.mp3"></audio>
 
-    <div id="music-toggle" class="fixed bottom-4 right-4 z-50 text-green-400 font-primary text-xs cursor-pointer border-2 border-green-400 p-2 hover:bg-green-400 hover:text-black">
+    <div id="music-toggle" class="fixed bottom-4 right-4 z-50 text-green-400 font-primary text-xs cursor-pointer border-2 border-green-400 p-2 hover:bg-green-400 hover:text-black transition-all duration-300 hover:text-glow">
         MUSIC: OFF
     </div>
 
@@ -133,41 +182,42 @@
         <div class="text-center z-10">
             <h1 class="font-primary text-4xl md:text-7xl red-glow flicker">🩸 Reclaim Your Foreskin 🩸</h1>
             <p class="mt-4 text-xl md:text-2xl font-secondary">Blast through the deception. Take back what’s yours.</p>
-            <button id="start-mission-btn" class="mt-8 font-primary text-2xl bg-red-600 hover:bg-red-700 px-8 py-4 border-4 border-black">Start Mission</button>
+            <!-- Start Mission button removed, space intentionally left blank -->
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 z-10 w-full max-w-4xl p-4">
-            <div class="aspect-square bg-gray-800 border-2 border-gray-500 hover:border-green-400 transition-all duration-300 group overflow-hidden relative">
-                <img src="dark and temples.jpg  " class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-red-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center font-primary text-lg">FLAME BURST</div>
+            <div class="hero-card group aspect-square">
+                <img src="dark and temples.jpg" class="w-full h-full object-cover aspect-square">
+                <div class="hero-card-overlay bg-red-500/70">FLAME BURST</div>
             </div>
-            <div class="aspect-square bg-gray-800 border-2 border-gray-500 hover:border-green-400 transition-all duration-300 group overflow-hidden relative">
-                <img src="dark in a hospital.jpg" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-green-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center font-primary text-lg">STATIC FLICKER</div>
+            <div class="hero-card group aspect-square">
+                <img src="dark in a hospital.jpg" class="w-full h-full object-cover aspect-square">
+                <div class="hero-card-overlay bg-green-500/70">STATIC FLICKER</div>
             </div>
-            <div class="aspect-square bg-gray-800 border-2 border-gray-500 hover:border-green-400 transition-all duration-300 group overflow-hidden relative">
-                <img src="clowns.jpg" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-blue-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center font-primary text-lg">RICOCHET</div>
+            <div class="hero-card group aspect-square">
+                <img src="clowns.jpg" class="w-full h-full object-cover aspect-square">
+                <div class="hero-card-overlay bg-blue-500/70">RICOCHET</div>
             </div>
-            <div class="aspect-square bg-gray-800 border-2 border-gray-500 hover:border-green-400 transition-all duration-300 group overflow-hidden relative">
-                <img src="misson_RYF.jpg" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-yellow-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center font-primary text-lg">BURN-IN</div>
+            <div class="hero-card group aspect-square">
+                <img src="misson_RYF.jpg" class="w-full h-full object-cover aspect-square">
+                <div class="hero-card-overlay bg-yellow-500/70">BURN-IN</div>
             </div>
         </div>
-
-          </section>
+    </section>
     
-    <section class="section" style="background: radial-gradient(ellipse at center, #2a0a2a 0%, var(--color-bg) 75%);">
-        <h2 class="font-primary text-3xl md:text-5xl text-center glitch fade-in" data-text="&quot;They took my foreskin. I’m getting it back.&quot;">"They took my foreskin. I’m getting it back."</h2>
+    <section class="section" style="background: radial-gradient(ellipse at center, #2a0a2e 0%, var(--color-bg) 75%); background-image: url('4.png'), radial-gradient(ellipse at center, #2a0a2e 0%, var(--color-bg) 75%); background-size: cover; background-position: center; position: relative;">
+        <div style="position:absolute;inset:0;background:rgba(10,10,30,0.7);backdrop-filter:blur(2px);z-index:0;"></div>
+        <h2 class="font-primary text-3xl md:text-5xl text-center glitch fade-in" data-text="&quot;They took my foreskin. I’m getting it back.&quot;" style="position:relative;z-index:1;">"They took my foreskin. I’m getting it back."</h2>
     </section>
 
-    <section id="scanner" class="section scanline" style="background-image: linear-gradient(to bottom, var(--color-bg), #081b21);">
-        <div class="w-full max-w-4xl border-8 border-cyan-400 bg-black/80 p-8 text-green-400 font-mono" style="box-shadow: 0 0 25px var(--color-cyan);">
+    <section id="scanner" class="section scanline" style="background: radial-gradient(ellipse at center, #081b21 0%, var(--color-bg) 80%); background-image: url('3.png'), radial-gradient(ellipse at center, #081b21 0%, var(--color-bg) 80%); background-size: cover; background-position: center; position: relative;">
+        <div style="position:absolute;inset:0;background:rgba(8,27,33,0.7);backdrop-filter:blur(2px);z-index:0;"></div>
+        <div class="w-full max-w-4xl border-8 border-cyan-400 bg-black/80 p-8 text-green-400 font-mono" style="box-shadow: 0 0 25px var(--color-cyan), 0 0 40px var(--color-cyan) inset; position:relative; z-index:1;">
             <p id="scanner-prompt" class="text-2xl typewriter-cursor cyan-glow"></p>
             <form id="twitter-form" class="mt-4 flex gap-4">
                 <span class="text-2xl font-bold cyan-glow">&gt;</span>
-                <input id="twitter-handle" type="text" class="flex-grow bg-transparent border-b-2 border-cyan-400 focus:outline-none text-2xl text-cyan-300" autocomplete="off">
-                <button type="submit" class="font-primary text-xl bg-cyan-600 hover:bg-cyan-700 px-4 py-2 border-2 border-black text-black">SUBMIT</button>
+                <input id="twitter-handle" type="text" class="flex-grow bg-transparent border-b-2 border-cyan-400 focus:outline-none text-2xl text-cyan-300 transition-all duration-300 focus:border-cyan-200 focus:text-white" autocomplete="off">
+                <button type="submit" class="font-primary text-xl bg-cyan-600 hover:bg-cyan-700 px-4 py-2 border-2 border-black text-black transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/50">SUBMIT</button>
             </form>
             <div id="scanner-ui" class="hidden mt-8">
                 <div class="w-full bg-gray-700 border-2 border-cyan-400 h-8">
@@ -175,28 +225,29 @@
                 </div>
                 <p id="scan-status" class="text-center mt-2 text-xl font-primary flicker cyan-glow"></p>
             </div>
-            <div id="dossier" class="hidden mt-8 grid md:grid-cols-3 gap-6 border-4 border-cyan-400 p-4">
+            <div id="dossier" class="hidden mt-8 grid md:grid-cols-3 gap-6 border-4 border-cyan-400 p-4 bg-black/20" style="backdrop-filter: blur(4px);">
                 <div class="md:col-span-1 flex items-center justify-center">
-                    <img id="dossier-pfp" src="" alt="Twitter Profile Picture" class="w-40 h-40 border-4 border-cyan-400 object-cover" style="filter: grayscale(1) sepia(1) hue-rotate(180deg) brightness(1.2);">
+                    <img id="dossier-pfp" src="" alt="Twitter Profile Picture" class="w-40 h-40 border-4 border-cyan-400 object-cover" style="filter: grayscale(1) sepia(1) hue-rotate(180deg) brightness(1.2) contrast(1.1);">
                 </div>
                 <div class="md:col-span-2 text-lg text-cyan-300">
                     <p><span class="font-bold">NAME:</span> <span id="dossier-name"></span></p>
                     <p><span class="font-bold">HANDLE:</span> <span id="dossier-handle"></span></p>
                     <p class="mt-2"><span class="font-bold">BIO:</span></p>
-                    <p id="dossier-bio" class="h-24 overflow-y-auto border border-cyan-600 p-2"></p>
+                    <p id="dossier-bio" class="h-24 overflow-y-auto border border-cyan-600 p-2 bg-black/30"></p>
                     <p id="dossier-meme" class="mt-4 font-primary text-red-500 text-xl text-center red-glow"></p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="community" class="section" style="background-image: linear-gradient(to top, var(--color-bg), #1a1a2e);">
-        <div class="w-full max-w-4xl text-center">
+    <section id="community" class="section" style="background: radial-gradient(ellipse at center, #1a1a2e 0%, var(--color-bg) 80%); background-image: url('1.png'), radial-gradient(ellipse at center, #1a1a2e 0%, var(--color-bg) 80%); background-size: cover; background-position: center; position: relative;">
+        <div style="position:absolute;inset:0;background:rgba(10,10,30,0.7);backdrop-filter:blur(2px);z-index:0;"></div>
+        <div class="w-full max-w-4xl text-center" style="position:relative;z-index:1;">
             <h2 class="font-primary text-4xl md:text-6xl red-glow mb-12">JOIN THE RESISTANCE</h2>
             <div class="flex flex-col md:flex-row gap-8 justify-center">
-                <a href="#" class="community-link font-primary text-2xl text-black bg-[#00FFFF] hover:bg-[#00BFFF] p-8 border-4 border-black transition-transform hover:scale-105">🔫 Twitter</a>
-                <a href="#" class="community-link font-primary text-2xl text-black bg-[#FF00FF] hover:bg-[#D900D9] p-8 border-4 border-black transition-transform hover:scale-105">🧠 Axiom</a>
-                <a href="#" class="community-link font-primary text-2xl text-black bg-[#FFFF00] hover:bg-[#DCDC00] p-8 border-4 border-black transition-transform hover:scale-105">🚀 Pumpfun</a>
+                <a href="#" class="community-link font-primary text-2xl text-black bg-[#00FFFF] hover:bg-[#00BFFF] p-8 border-4 border-black transition-all duration-300">🔫 Twitter</a>
+                <a href="#" class="community-link font-primary text-2xl text-black bg-[#FF00FF] hover:bg-[#D900D9] p-8 border-4 border-black transition-all duration-300">🧠 Axiom</a>
+                <a href="#" class="community-link font-primary text-2xl text-black bg-[#FFFF00] hover:bg-[#DCDC00] p-8 border-4 border-black transition-all duration-300">🚀 Pumpfun</a>
             </div>
         </div>
     </section>
@@ -339,15 +390,7 @@
                 setTimeout(() => screenFlash.classList.remove('flash-anim'), 200);
             }
 
-            startMissionBtn.addEventListener('click', () => {
-                playSoundSafe(gunshotSound, playGunshotSynth);
-                startMissionBtn.classList.add('recoil');
-                doScreenFlash();
-                setTimeout(() => startMissionBtn.classList.remove('recoil'), 100);
-                document.getElementById('scanner').scrollIntoView({ behavior: 'smooth' });
-            });
-
-            document.querySelectorAll('#hero .aspect-square, #hero img').forEach(el => {
+            document.querySelectorAll('#hero .hero-card').forEach(el => {
                 el.addEventListener('click', () => {
                     playSoundSafe(gunshotSound, playGunshotSynth);
                     doScreenFlash();
