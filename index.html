@@ -109,14 +109,7 @@
             transition: width 2s ease-out;
             box-shadow: 0 0 10px var(--color-green), 0 0 20px var(--color-green);
         }
-        .hero-card {
-            aspect-square: 1;
-            background-color: #1a1a1a;
-            border: 2px solid var(--color-gray);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
+       
         .hero-card:hover {
             transform: translateY(-10px) scale(1.05);
             border-color: var(--color-green);
@@ -148,9 +141,53 @@
             opacity: 1;
         }
         .community-link:hover {
-            box-shadow: 0 0 20px var(--color-magenta), 0 0 30px var(--color-magenta) inset;
+            box-shadow: 0 0 20px var(--color-cyan), 0 0 30px var(--color-cyan) inset;
             transform: scale(1.05) translateY(-5px);
-            filter: brightness(1.2);
+            filter: brightness(1.1);
+        }
+
+        /* --- Hero HUD add-ons --- */
+        .hud-corner { position: absolute; width: 48px; height: 48px; z-index: 11; }
+        .hud-corner.tl { top: 12px; left: 12px; border-top: 3px solid var(--color-cyan); border-left: 3px solid var(--color-cyan); }
+        .hud-corner.tr { top: 12px; right: 12px; border-top: 3px solid var(--color-cyan); border-right: 3px solid var(--color-cyan); }
+        .hud-corner.bl { bottom: 12px; left: 12px; border-bottom: 3px solid var(--color-cyan); border-left: 3px solid var(--color-cyan); }
+        .hud-corner.br { bottom: 12px; right: 12px; border-bottom: 3px solid var(--color-cyan); border-right: 3px solid var(--color-cyan); }
+
+        .hero-cta { border: 4px solid var(--color-cyan); background: rgba(0,0,0,0.6); color: #cffafe; box-shadow: 0 0 18px var(--color-cyan), 0 0 18px var(--color-cyan) inset; transition: transform .2s ease, background .2s ease; }
+        .hero-cta:hover { background: var(--color-cyan); color: #000; transform: translateY(-2px) scale(1.03); }
+
+        .stat-pill { border: 2px solid var(--color-cyan); background: rgba(0,0,0,0.5); color: #a7f3d0; box-shadow: 0 0 10px rgba(0,255,255,0.25) inset; }
+        .stat-number { font-family: var(--font-primary); font-size: 1.25rem; }
+
+        .mini-radar { width: 120px; height: 120px; border: 3px solid var(--color-cyan); border-radius: 50%; position: relative; box-shadow: 0 0 20px rgba(0,255,255,0.4) inset; background: radial-gradient(circle at center, rgba(0,255,255,0.12) 0%, rgba(0,0,0,0) 60%); overflow: hidden; }
+        .mini-radar::after { content: ''; position: absolute; width: 50%; height: 2px; background: var(--color-cyan); left: 50%; top: 50%; transform-origin: left center; animation: radar-sweep 3s linear infinite; box-shadow: 0 0 10px var(--color-cyan); }
+        @keyframes radar-sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .mini-radar .dot { position: absolute; width: 6px; height: 6px; background: var(--color-green); border-radius: 50%; box-shadow: 0 0 8px var(--color-green); animation: dot-blink 2s infinite; }
+        .mini-radar .dot:nth-child(1) { left: 20%; top: 30%; animation-delay: .2s; }
+        .mini-radar .dot:nth-child(2) { right: 22%; top: 55%; animation-delay: .9s; }
+        .mini-radar .dot:nth-child(3) { left: 40%; bottom: 18%; animation-delay: 1.4s; }
+        @keyframes dot-blink { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+
+        /* Transmission equalizer */
+        .eq-bar {
+            width: 6px;
+            background: var(--color-cyan);
+            box-shadow: 0 0 10px var(--color-cyan);
+            height: 20%;
+            transform-origin: bottom center;
+            animation: eq-pulse 1.2s ease-in-out infinite;
+        }
+        .eq-bar:nth-child(1) { animation-delay: 0s; }
+        .eq-bar:nth-child(2) { animation-delay: .1s; }
+        .eq-bar:nth-child(3) { animation-delay: .2s; }
+        .eq-bar:nth-child(4) { animation-delay: .3s; }
+        .eq-bar:nth-child(5) { animation-delay: .4s; }
+        .eq-bar:nth-child(6) { animation-delay: .5s; }
+        .eq-bar:nth-child(7) { animation-delay: .6s; }
+        .eq-bar:nth-child(8) { animation-delay: .7s; }
+        @keyframes eq-pulse {
+            0%, 100% { height: 25%; opacity: .8; }
+            50% { height: 100%; opacity: 1; }
         }
     </style>
 </head>
@@ -177,37 +214,74 @@
         MUSIC: OFF
     </div>
 
-    <section id="hero" class="section justify-between bg-cover bg-center" style="background-image: url('cyber_punk_dark.jpg'); padding-top: 10rem;">
+    <section id="hero" class="section justify-between bg-cover bg-center relative" style="background-image: url('cyber_punk_dark.jpg'); padding-top: 10rem;">
         <div class="absolute inset-0 bg-black/50 scanline"></div>
+        <!-- HUD Corners -->
+        <div class="hud-corner tl"></div>
+        <div class="hud-corner tr"></div>
+        <div class="hud-corner bl"></div>
+        <div class="hud-corner br"></div>
+
+        <!-- Mini Radar -->
+        <div class="absolute right-6 top-6 z-10 hidden md:block">
+            <div class="mini-radar">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+
         <div class="text-center z-10">
             <h1 class="font-primary text-4xl md:text-7xl red-glow flicker">🩸 Reclaim Your Foreskin 🩸</h1>
             <p class="mt-4 text-xl md:text-2xl font-secondary">Blast through the deception. Take back what’s yours.</p>
-            <!-- Start Mission button removed, space intentionally left blank -->
-        </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 z-10 w-full max-w-4xl p-4">
-            <div class="hero-card group aspect-square">
-                <img src="dark and temples.jpg" class="w-full h-full object-cover aspect-square">
-                <div class="hero-card-overlay bg-red-500/70">FLAME BURST</div>
+            <!-- CTAs -->
+            <div class="mt-10 flex flex-col md:flex-row items-center justify-center gap-4">
+                <a href="#scanner" class="hero-cta font-primary text-lg md:text-xl px-6 py-4">INITIATE SCAN</a>
+                <a href="#community" class="hero-cta font-primary text-lg md:text-xl px-6 py-4">JOIN RESISTANCE</a>
             </div>
-            <div class="hero-card group aspect-square">
-                <img src="dark in a hospital.jpg" class="w-full h-full object-cover aspect-square">
-                <div class="hero-card-overlay bg-green-500/70">STATIC FLICKER</div>
-            </div>
-            <div class="hero-card group aspect-square">
-                <img src="clowns.jpg" class="w-full h-full object-cover aspect-square">
-                <div class="hero-card-overlay bg-blue-500/70">RICOCHET</div>
-            </div>
-            <div class="hero-card group aspect-square">
-                <img src="misson_RYF.jpg" class="w-full h-full object-cover aspect-square">
-                <div class="hero-card-overlay bg-yellow-500/70">BURN-IN</div>
+
+            <!-- Stats Bar -->
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <div class="stat-pill px-4 py-3">AGENTS ONLINE: <span class="stat-number" data-counter-target="7421">0</span></div>
+                <div class="stat-pill px-4 py-3">OPERATIONS: <span class="stat-number" data-counter-target="128">0</span></div>
+                <div class="stat-pill px-4 py-3">SECURITY LEVEL: <span class="stat-number" data-counter-target="99">0</span>%</div>
             </div>
         </div>
     </section>
     
-    <section class="section" style="background: radial-gradient(ellipse at center, #2a0a2e 0%, var(--color-bg) 75%); background-image: url('4.png'), radial-gradient(ellipse at center, #2a0a2e 0%, var(--color-bg) 75%); background-size: cover; background-position: center; position: relative;">
-        <div style="position:absolute;inset:0;background:rgba(10,10,30,0.7);backdrop-filter:blur(2px);z-index:0;"></div>
-        <h2 class="font-primary text-3xl md:text-5xl text-center glitch fade-in" data-text="&quot;They took my foreskin. I’m getting it back.&quot;" style="position:relative;z-index:1;">"They took my foreskin. I’m getting it back."</h2>
+    <section id="transmission" class="section scanline" style="background: radial-gradient(ellipse at center, #081b21 0%, var(--color-bg) 80%); background-image: url('4.png'), radial-gradient(ellipse at center, #081b21 0%, var(--color-bg) 80%); background-size: cover; background-position: center; position: relative;">
+        <div style="position:absolute;inset:0;background:rgba(8,27,33,0.7);backdrop-filter:blur(2px);z-index:0;"></div>
+        <div class="w-full max-w-4xl border-8 border-cyan-400 bg-black/80 p-8" style="box-shadow: 0 0 25px var(--color-cyan), 0 0 40px var(--color-cyan) inset; position:relative; z-index:1;">
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+                <div class="md:w-1/3 flex flex-col items-center gap-4">
+                    <div class="mini-radar" style="width:140px;height:140px;">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <div class="flex items-end gap-2 h-16">
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                    </div>
+                </div>
+                <div class="md:w-2/3 text-cyan-100">
+                    <h2 class="font-primary text-3xl md:text-5xl cyan-glow mb-4">INCOMING TRANSMISSION</h2>
+                    <p id="transmission-text" class="font-mono text-lg md:text-xl leading-relaxed border border-cyan-500 bg-black/40 p-4 min-h-[96px] typewriter-cursor"></p>
+                    <div class="mt-4 flex flex-wrap gap-3">
+                        <span class="stat-pill px-3 py-2">ENCRYPTION: AES-256</span>
+                        <span class="stat-pill px-3 py-2">CHANNEL: SECURE</span>
+                        <span class="stat-pill px-3 py-2">VISUAL: CRT MODE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <section id="scanner" class="section scanline" style="background: radial-gradient(ellipse at center, #081b21 0%, var(--color-bg) 80%); background-image: url('6.png'), radial-gradient(ellipse at center, #081b21 0%, var(--color-bg) 80%); background-size: cover; background-position: center; position: relative;">
@@ -240,14 +314,14 @@
         </div>
     </section>
 
-    <section id="community" class="section" style="background: radial-gradient(ellipse at center, #1a1a2e 0%, var(--color-bg) 80%); background-image: url('1.png'), radial-gradient(ellipse at center, #1a1a2e 0%, var(--color-bg) 80%); background-size: cover; background-position: center; position: relative;">
-        <div style="position:absolute;inset:0;background:rgba(10,10,30,0.7);backdrop-filter:blur(2px);z-index:0;"></div>
-        <div class="w-full max-w-4xl text-center" style="position:relative;z-index:1;">
-            <h2 class="font-primary text-4xl md:text-6xl red-glow mb-12">JOIN THE RESISTANCE</h2>
-            <div class="flex flex-col md:flex-row gap-8 justify-center">
-                <a href="#" class="community-link font-primary text-2xl text-black bg-[#00FFFF] hover:bg-[#00BFFF] p-8 border-4 border-black transition-all duration-300">🔫 Twitter</a>
-                <a href="#" class="community-link font-primary text-2xl text-black bg-[#FF00FF] hover:bg-[#D900D9] p-8 border-4 border-black transition-all duration-300">🧠 Axiom</a>
-                <a href="#" class="community-link font-primary text-2xl text-black bg-[#FFFF00] hover:bg-[#DCDC00] p-8 border-4 border-black transition-all duration-300">🚀 Pumpfun</a>
+    <section id="community" class="section scanline" style="background: radial-gradient(ellipse at center, #081b21 0%, var(--color-bg) 80%); background-image: url('1.png'), radial-gradient(ellipse at center, #081b21 0%, var(--color-bg) 80%); background-size: cover; background-position: center; position: relative;">
+        <div style="position:absolute;inset:0;background:rgba(8,27,33,0.7);backdrop-filter:blur(2px);z-index:0;"></div>
+        <div class="w-full max-w-4xl border-8 border-cyan-400 bg-black/80 p-8 text-center" style="box-shadow: 0 0 25px var(--color-cyan), 0 0 40px var(--color-cyan) inset; position:relative; z-index:1;">
+            <h2 class="font-primary text-4xl md:text-6xl cyan-glow mb-12">JOIN THE RESISTANCE</h2>
+            <div class="flex flex-col md:flex-row gap-6 justify-center">
+                <a href="#" class="community-link font-primary text-xl md:text-2xl text-cyan-200 px-6 py-4 border-4 border-cyan-400 bg-black/40 transition-all duration-300 hover:bg-cyan-600 hover:text-black hover:shadow-lg hover:shadow-cyan-500/50">🔫 Twitter</a>
+                <a href="#" class="community-link font-primary text-xl md:text-2xl text-cyan-200 px-6 py-4 border-4 border-cyan-400 bg-black/40 transition-all duration-300 hover:bg-cyan-600 hover:text-black hover:shadow-lg hover:shadow-cyan-500/50">🧠 Axiom</a>
+                <a href="#" class="community-link font-primary text-xl md:text-2xl text-cyan-200 px-6 py-4 border-4 border-cyan-400 bg-black/40 transition-all duration-300 hover:bg-cyan-600 hover:text-black hover:shadow-lg hover:shadow-cyan-500/50">🚀 Pumpfun</a>
             </div>
         </div>
     </section>
@@ -397,6 +471,34 @@
                 });
             });
 
+            // Hero CTA buttons: sounds + flash
+            document.querySelectorAll('.hero-cta').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const href = (btn.getAttribute('href') || '').toLowerCase();
+                    if (href.includes('scanner')) {
+                        playSoundSafe(gunshotSound, playGunshotSynth);
+                    } else {
+                        playSoundSafe(reloadSound, () => playBeep(440, 0.1));
+                    }
+                    doScreenFlash();
+                });
+            });
+
+            // --- Animated counters on hero ---
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-counter-target') || '0', 10);
+                let value = 0;
+                const durationMs = 1500;
+                const stepMs = 20;
+                const increment = Math.max(1, Math.floor(target / (durationMs / stepMs)));
+                const timer = setInterval(() => {
+                    value += increment;
+                    if (value >= target) { value = target; clearInterval(timer); }
+                    counter.textContent = value.toString();
+                }, stepMs);
+            });
+
             document.querySelectorAll('.community-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -429,6 +531,23 @@
             
             const scannerPromptEl = document.getElementById('scanner-prompt');
             typeWriter(scannerPromptEl, "Soldier, identify yourself! What’s your Twitter handle?");
+
+            // Rotating quotes for transmission section (typewriter)
+            const transmissionEl = document.getElementById('transmission-text');
+            const transmissionLines = [
+                'They took my foreskin. I\'m getting it back.',
+                'Operation RYF is green-lit. Hold the line.',
+                'No more lies. Reclaim what\'s yours.'
+            ];
+            let tIndex = 0;
+            function typeTransmission() {
+                if (!transmissionEl) return;
+                transmissionEl.textContent = '';
+                typeWriter(transmissionEl, transmissionLines[tIndex]);
+                tIndex = (tIndex + 1) % transmissionLines.length;
+            }
+            typeTransmission();
+            setInterval(typeTransmission, 5000);
 
             const twitterForm = document.getElementById('twitter-form');
             const twitterHandleInput = document.getElementById('twitter-handle');
